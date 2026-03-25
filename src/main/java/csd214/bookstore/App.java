@@ -5,18 +5,25 @@ import csd214.bookstore.entities.*;
 import csd214.bookstore.pojos.*;
 import csd214.bookstore.repositories.IRepository;
 import csd214.bookstore.services.BookstoreService;
+import csd214.bookstore.services.*;
+
 
 import java.util.List;
 import java.util.Scanner;
 
 public class App {
     private IRepository<ProductEntity> repository;
-    private BookstoreService service; // The Chef
+    private BookstoreService bookstoreService; // The Chef
+    private PhoneService phoneService;
+    private LaptopService laptopService;
 
     // INJECTION: App doesn't use the 'new' keyword for repos anymore
-    public App(IRepository<ProductEntity> repository) {
+    public App(IRepository<ProductEntity> repository, BookstoreService bookstoreService, PhoneService phoneService, LaptopService laptopService) {
         this.repository = repository;
-        this.service = new BookstoreService(repository);
+        this.bookstoreService = bookstoreService;
+        this.phoneService = phoneService;
+        this.laptopService = laptopService;
+
     }
     // UI & Logic
     private CashTill cashTill = new CashTill();
@@ -46,6 +53,8 @@ public class App {
             System.out.println(" 4. Sell item(s)");
             System.out.println(" 5. List items");
             System.out.println(" 6. System Reset (Wipe DB)");
+            System.out.println(" 7. Update Phone Price");
+            System.out.println(" 8. Update Laptop Screen Size Inches");
             System.out.println("99. Quit");
             System.out.println("***********************");
             System.out.print("Enter choice: ");
@@ -66,6 +75,8 @@ public class App {
                 case 4: sellItem(); break;
                 case 5: listAny(); break;
                 case 6: systemReset(); break; // New Bulk Delete Feature
+                case 7: phonePriceFeature(); break;
+                case 8: laptopScreenSizeInchesFeature(); break;
                 case 99: System.out.println("Goodbye."); break;
                 default: System.out.println("Invalid choice.");
             }
@@ -83,6 +94,8 @@ public class App {
         System.out.println("4. Ticket");
         System.out.println("5. Pen");
         System.out.println("6. Notebook");
+        System.out.println("7. Phone");
+        System.out.println("8. Laptop");
         System.out.println("99. Back");
 
         int choice = getIntInput();
@@ -271,7 +284,7 @@ public class App {
 
         // 5. DELEGATION: Pass the ID to the Service (The Chef)
         // The App doesn't care HOW the sale happens, it just tells the service to do it.
-        service.performSale(dbId);
+        bookstoreService.performSale(dbId);
 
         // 6. Update the UI-side Cash Till
         // We create a temporary SaleableItem wrapper to pass the price to the Till
@@ -336,6 +349,30 @@ public class App {
             return Integer.parseInt(line.trim());
         } catch (NumberFormatException e) {
             return -1;
+        }
+    }
+
+    public void phonePriceFeature() {
+        listAny();
+        System.out.print("Enter index of Phone to customize: ");
+        int idx = getIntInput();
+        List<ProductEntity> results = repository.findAll();
+        if(idx >= 0 && idx < results.size()) {
+            System.out.print("Enter new price: ");
+            double price = Double.parseDouble(input.nextLine());
+            phoneService.updatePhonePrice(results.get(idx).getId(), price);
+        }
+    }
+
+    public void laptopScreenSizeInchesFeature() {
+        listAny();
+        System.out.print("Enter index of Laptop to customize: ");
+        int idx = getIntInput();
+        List<ProductEntity> results = repository.findAll();
+        if(idx >= 0 && idx < results.size()) {
+            System.out.print("Enter new screen size inches: ");
+            double screenSizeInches = Double.parseDouble(input.nextLine());
+            laptopService.updateLaptopScreenSizeInches(results.get(idx).getId(), screenSizeInches);
         }
     }
 }
