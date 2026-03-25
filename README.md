@@ -80,3 +80,14 @@ src/main/java/csd214/bookstore/
 
 ## ⚖️ License
 Educational use for CSD214 - Sault College.
+
+## Lab 5 Reflection
+1. No, I did not need to change any code in App.java or in the service classes when switching repositories because both implementations use the same `IRepository<ProductEntity>` interface. Since the repository is injected from Main.java, the rest of the application is decoupled from the specific implementation. This makes the system flexible, allowing changes to the data structure or performance without affecting the UI or business logic.
+
+2. HashMap felt more efficient than ArrayList because it uses O(1) lookup instead of O(n). Even though the App doesn’t know the difference, performance improves significantly with large datasets. The Repository Pattern allows this optimization without changing the UI code.
+
+3. RAM-based repositories are fast but lose data when we stop the program, this is good for testing. MySqlRepository persists data, ensuring stability in production despite being slower, which is essential for reliable real-world use.
+
+4. This made the app easier to manage, keeping App and Services decoupled. This manual wiring mimics Spring Boot, making the system more flexible and maintainable.
+
+5. Moving business logic into Services cleaned up the App, keeping the UI focused only on interaction. This separation makes the code more reusable, so the same Services could be used in a mobile or web app without changes.
